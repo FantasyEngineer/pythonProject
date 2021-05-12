@@ -9,6 +9,7 @@ from typing import List
 
 t = ['a', 'b', 'c', 'd', 'e']
 tinylist = [123, 'runoob']
+print(t.index("b"))
 
 # 输出整个列表
 print(t)
