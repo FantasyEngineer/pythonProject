@@ -17,6 +17,18 @@ from pip._internal.utils import subprocess
 wb: Workbook
 sheet: Worksheet
 
+def formatForm(form, width, heigth):
+    """设置居中显示"""
+    # 得到屏幕宽度
+    win_width = form.winfo_screenwidth()
+    # 得到屏幕高度
+    win_higth = form.winfo_screenheight()
+
+    # 计算偏移量
+    width_adjust = (win_width - width) / 2
+    higth_adjust = (win_higth - heigth) / 2
+
+    form.geometry("%dx%d+%d+%d" % (width, heigth, width_adjust, higth_adjust))
 
 # 点击查看日历
 def lookCal():
@@ -239,8 +251,7 @@ window = Tk()
 window.title('复兴总工时处理程序')
 window.configure(bg='white')
 # 创建大小，以及位移
-window.geometry('800x400+300+200')
-
+formatForm(window, 600, 400)
 # ------------------------------创建处理总工时的年月日容器------------------------------
 
 frameTime = Frame(window)
