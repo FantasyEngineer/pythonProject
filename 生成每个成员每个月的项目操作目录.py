@@ -43,11 +43,7 @@ def getIndexBysheet(sheet: Worksheet):
 
 index1 = getIndexBysheet(sheet1)
 print("1月", index1)
-# 通过循环得到姓名所在的列
-nameIndex = index1.get("nameIndex")
-projectIndex = index1.get("projectIndex")
-hourIndex = index1.get("hourIndex")
-
+# 通过循环得到姓名等数据所在的列
 index2 = getIndexBysheet(sheet2)
 print("2月", index2)
 index3 = getIndexBysheet(sheet3)
@@ -87,7 +83,7 @@ for name in nameSet:
     if name is None:
         print("发现异常数据None,跳过")
         continue
-    if name.__eq__("#N/A"):
+    if name.__eq__("#N/A") or name.__eq__("0"):
         print("发现异常数据#N/A,跳过")
         continue
     # 先创建
@@ -141,61 +137,110 @@ for name in nameSet:
     nameSheet['f3'].font = Font(bold=True)
     nameSheet['f3'].alignment = Alignment(horizontal='center', vertical='center')
 
-    # 需要在1月的内容里面填数据，首先是姓名 根据是c4,c5,c6,c7,填写f4,f5,f6,f7
-    sheet1_rows_value = sheet1.rows
-    for row in sheet1_rows_value:
-        sheet1_name: str = row[nameIndex - 1].value
-        # 判断两个名字相同，说明1月份的当前姓名的行已经找到了。
-        if sheet1_name.__eq__(name):
-            # 接下来就是要找对应的项目，将项目的实际工时累加起来，填入到excel中
-            # 取出姓名一致时的项目
-            projecName: str = row[projectIndex - 1].value
-            # print(projecName)
-            # print(nameSheet['c4'].value)
-            if projecName.__eq__(nameSheet['c4'].value):  # 平台改版优化
-                originHour: int = row[hourIndex - 1].value
-                # 如果数据是空的
-                if None is nameSheet['f4'].value:
-                    nameSheet['f4'] = 0
-                # 进行当前人，当前项目的累加操作
-                nameSheet['f4'] = nameSheet['f4'].value + originHour
-            elif projecName.__eq__(nameSheet['c5'].value):  # 智能科创优化
-                originHour: int = row[hourIndex - 1].value
-                # 如果数据是空的
-                if None is nameSheet['f5'].value:
-                    nameSheet['f5'] = 0
-                # 进行当前人，当前项目的累加操作
-                nameSheet['f5'] = nameSheet['f5'].value + originHour
-            elif projecName.__eq__(nameSheet['c6'].value):  # TC_UK
-                originHour: int = row[hourIndex - 1].value
-                # 如果数据是空的
-                if None is nameSheet['f6'].value:
-                    nameSheet['f6'] = 0
-                # 进行当前人，当前项目的累加操作
-                nameSheet['f6'] = nameSheet['f6'].value + originHour
-            elif projecName.__eq__(nameSheet['c7'].value):  # 酒店及旅行社相关
-                originHour: int = row[hourIndex - 1].value
-                # 如果数据是空的
-                if None is nameSheet['f7'].value:
-                    nameSheet['f7'] = 0
-                # 进行当前人，当前项目的累加操作
-                nameSheet['f7'] = nameSheet['f7'].value + originHour
-    # 填写f8 1月的总计
-    oneMonthTotal: int = 0
-    for i in range(4, 8):
-        value = nameSheet.cell(row=i, column=6).value
-        if value is None:
-            continue
-        oneMonthTotal += value
+    # ------------------------------------需要在1月的内容里面填数据，首先是姓名 根据是c4,c5,c6,c7,填写f4,f5,f6,f7
+    # sheet1_rows_value = sheet1.rows
+    # for row in sheet1_rows_value:
+    #     sheet1_name: str = row[index1["nameIndex"] - 1].value
+    #     # 判断两个名字相同，说明1月份的当前姓名的行已经找到了。
+    #     if sheet1_name.__eq__(name):
+    #         # 接下来就是要找对应的项目，将项目的实际工时累加起来，填入到excel中
+    #         # 取出姓名一致时的项目
+    #         projecName: str = row[index1["projectIndex"] - 1].value
+    #         # print(projecName)
+    #         # print(nameSheet['c4'].value)
+    #         if projecName.__eq__(nameSheet['c4'].value):  # 平台改版优化
+    #             originHour: int = row[index1["hourIndex"] - 1].value
+    #             # 如果数据是空的
+    #             if None is nameSheet['f4'].value:
+    #                 nameSheet['f4'] = 0
+    #             # 进行当前人，当前项目的累加操作
+    #             nameSheet['f4'] = nameSheet['f4'].value + originHour
+    #         elif projecName.__eq__(nameSheet['c5'].value):  # 智能科创优化
+    #             originHour: int = row[index1["hourIndex"] - 1].value
+    #             # 如果数据是空的
+    #             if None is nameSheet['f5'].value:
+    #                 nameSheet['f5'] = 0
+    #             # 进行当前人，当前项目的累加操作
+    #             nameSheet['f5'] = nameSheet['f5'].value + originHour
+    #         elif projecName.__eq__(nameSheet['c6'].value):  # TC_UK
+    #             originHour: int = row[index1["hourIndex"] - 1].value
+    #             # 如果数据是空的
+    #             if None is nameSheet['f6'].value:
+    #                 nameSheet['f6'] = 0
+    #             # 进行当前人，当前项目的累加操作
+    #             nameSheet['f6'] = nameSheet['f6'].value + originHour
+    #         elif projecName.__eq__(nameSheet['c7'].value):  # 酒店及旅行社相关
+    #             originHour: int = row[index1["hourIndex"] - 1].value
+    #             # 如果数据是空的
+    #             if None is nameSheet['f7'].value:
+    #                 nameSheet['f7'] = 0
+    #             # 进行当前人，当前项目的累加操作
+    #             nameSheet['f7'] = nameSheet['f7'].value + originHour
+    # # 填写f8 1月的总计
+    # oneMonthTotal: int = 0
+    # for i in range(4, 8):
+    #     value = nameSheet.cell(row=i, column=6).value
+    #     if value is None:
+    #         continue
+    #     oneMonthTotal += value
+    # # print(name, oneMonthTotal)
+    # if oneMonthTotal != 0:
+    #     nameSheet['f8'] = oneMonthTotal
 
-    # print(name, oneMonthTotal)
-    if oneMonthTotal != 0:
-        nameSheet['f8'] = oneMonthTotal
+    # ------------------------------------需要在2月的内容里面填数据，首先是姓名 根据是c4,c5,c6,c7,填写g4,g5,g6,g7
+    originHour = 0
 
     nameSheet.column_dimensions["g"].width = 10
     nameSheet['g3'] = "2月"
     nameSheet['g3'].font = Font(bold=True)
     nameSheet['g3'].alignment = Alignment(horizontal='center', vertical='center')
+
+    sheet1_rows_value = sheet2.rows
+    # i = 0
+    for row in sheet1_rows_value:
+        # i += 1
+        # print(i)
+        sheet1_name: str = row[index2["nameIndex"] - 1].value
+        # 判断两个名字相同，说明1月份的当前姓名的行已经找到了。
+        if sheet1_name.__eq__(name):
+            print('sheet1_name', sheet1_name)
+            print('name', name)
+            # 接下来就是要找对应的项目，将项目的实际工时累加起来，填入到excel中
+            # 取出姓名一致时的项目
+            projecName: str = row[index2["projectIndex"] - 1].value
+            print("projecName", projecName)
+            print("nameSheet['c4'].value", nameSheet['c4'].value)
+
+            if projecName.__eq__(nameSheet['c4'].value):  # 平台改版优化
+                originHour: int = row[index2["hourIndex"] - 1].value
+                # 如果数据是空的
+                if None is nameSheet['g4'].value:
+                    nameSheet['g4'] = 0
+                # 进行当前人，当前项目的累加操作
+                nameSheet['g4'] = nameSheet['g4'].value + originHour
+            elif projecName.__eq__(nameSheet['c5'].value):  # 智能科创优化
+                originHour2: int = row[index2["hourIndex"] - 1].value
+                # 如果数据是空的
+                if None is nameSheet['g5'].value:
+                    nameSheet['g5'] = 0
+                # 进行当前人，当前项目的累加操作
+                nameSheet['g5'] = nameSheet['g5'].value + originHour2
+            elif projecName.__eq__(nameSheet['c6'].value):  # TC_UK
+                originHour3: int = row[index2["hourIndex"] - 1].value
+                # 如果数据是空的
+                if None is nameSheet['g6'].value:
+                    nameSheet['g6'] = 0
+                # 进行当前人，当前项目的累加操作
+                nameSheet['g6'] = nameSheet['g6'].value + originHour3
+            elif projecName.__eq__(nameSheet['c7'].value):  # 酒店及旅行社相关
+                originHour4: int = row[index2["hourIndex"] - 1].value
+                # 如果数据是空的
+                if None is nameSheet['g7'].value:
+                    nameSheet['g7'] = 0
+                # 进行当前人，当前项目的累加操作
+                nameSheet['g7'] = nameSheet['g7'].value + originHour4
+
+    # ------------------------------------需要在3月的内容里面填数据，首先是姓名 根据是c4,c5,c6,c7,填写h4,h5,h6,h7
 
     nameSheet.column_dimensions["h"].width = 10
     nameSheet['h3'] = "3月"
