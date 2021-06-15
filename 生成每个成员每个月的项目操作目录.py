@@ -189,7 +189,8 @@ for name in nameSet:
         oneMonthTotal += value
 
     # print(name, oneMonthTotal)
-    nameSheet['f8'] = oneMonthTotal
+    if oneMonthTotal != 0:
+        nameSheet['f8'] = oneMonthTotal
 
     nameSheet.column_dimensions["g"].width = 10
     nameSheet['g3'] = "2月"
